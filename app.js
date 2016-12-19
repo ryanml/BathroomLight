@@ -21,7 +21,7 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/client/index.html');
 });
 
-server.socket(http);
+server.light(http);
 
 http.listen(app.get('port'), '0.0.0.0', function(arg) {
   console.log('Server listening on port 8000');

@@ -1,5 +1,22 @@
 /** style.css **/
 
-p {
+.container {
+    width:100%;
+}
+.inner {
+    width:80%;
+    margin:0 auto;
+    text-align:center;
+}
+.open {
+    color:#27E833;
+}
+.closed {
     color:#FF0000;
+}
+.caution {
+    color:#FFBE00;
+}
+strong {
+    display:none;
 }
