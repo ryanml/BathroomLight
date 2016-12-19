@@ -1,11 +1,20 @@
-var interf = require("johnny-five");
-var board = new interf.Board();
+var jfLib = require("johnny-five");
+var board = new jfLib.Board();
 
 board.on("ready", function() {
 
     var start, end;
-    var doorOpen = true;
-    const coolDown = 10000;
+    var doorOpen = true,
+    rgbState = false;
+
+    const coolDown = 5000;
+    const longLimit = 10000;
+
+    const leds = {
+        yellow: new jfLib.Led(3),
+        green: new jfLib.Led(4),
+        red: new jfLib.Led(5)
+    };
 
     const pinLayout = {
         pins: {
@@ -15,8 +24,17 @@ board.on("ready", function() {
         }
     };
 
-    const turnAllOff = (leds) => {
-        leds.map(led => led.off());
+    const ledButton = new jfLib.Button(2);
+    const rgbButton = new jfLib.Button(13);
+
+    const rgbLed = new jfLib.Led.RGB(pinLayout);
+
+    const turnAllOff = () => {
+        for (var l in leds) {
+            if (leds.hasOwnProperty(l)) {
+                leds[l].off();
+            }
+        }
     }
 
     const randomHex = () => {
@@ -32,20 +50,15 @@ board.on("ready", function() {
         return hex;
     };
 
-    var leds {
-        yellow: new interf.Led(3),
-        green: new interf.Led(4),
-        red: new interf.Led(5)
-    };
+    /*
+     * Main 
+     */
 
-    var ledButton = new interf.Button(2);
-    var rgbButton = new interf.Button(13);
-
-    var rgbLed = new interf.Led.RGB(pinLayout);
-    var rgbState = false;
+    // We presumably start with the door open
+    leds.green.on();
 
     ledButton.on('down', () => {
-        turnAllOff();
+        turnAllOff(leds);
         if (doorOpen) {
             doorOpen = false;
             start = new Date();
@@ -53,8 +66,13 @@ board.on("ready", function() {
         } else {
             doorOpen = true;
             end = new Date();
-            if ((end - start) > coolDown) {
+            if ((end - start) > longLimit) {
                 leds.yellow.on();
+                setTimeout(() => {
+                    leds.yellow.off();
+                    leds.green.on();
+                }, coolDown);
+
             } else {
                 leds.green.on();
             }
