@@ -6,10 +6,6 @@ exports.light = (http) => {
 
     board.on("ready", function() {
 
-        var start, end;
-        var doorOpen = true,
-        rgbState = false;
-
         const coolDown = 5000;
         const longLimit = 10000;
 
@@ -55,6 +51,9 @@ exports.light = (http) => {
 
         // We presumably start with the door open
         sock.on('connection', (conn) => {
+            var start, end;
+            var doorOpen = true,
+            rgbState = false;
 
             leds.green.on();
 
