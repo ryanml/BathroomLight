@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var path = require('path');
-var server = require('./server')
+var server = require('./server');
 
 const PORT = 8000;
 

@@ -3,6 +3,8 @@ exports.light = (http) => {
     var jfLib = require('johnny-five');
     var board = new jfLib.Board();
     var sock = require('socket.io')(http);
+    var mongo = require('./mongoWrapper');
+    var mongoWrapper = new mongo();
 
     board.on('ready', function() {
         const coolDown = 5000;
