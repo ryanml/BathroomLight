@@ -1,5 +1,6 @@
 'use strict';
 exports.light = (http) => {
+    
     var jfLib = require('johnny-five');
     var board = new jfLib.Board();
     var sock = require('socket.io')(http);
@@ -7,6 +8,9 @@ exports.light = (http) => {
     var mongoWrapper = new mongo();
 
     board.on('ready', function() {
+
+        var start, end;
+        var doorOpen = true;
         const coolDown = 5000;
         const longLimit = 10000;
         const leds = {
@@ -37,46 +41,43 @@ exports.light = (http) => {
             return hex;
         };
 
-        const doGreen = (c) => {
+        const doGreen = (/*c*/) => {
             leds.green.on();
             c.emit('open');
         };
 
-        const doYellow = (c) => {
+        const doYellow = (/*c*/) => {
             leds.yellow.on();
             c.emit('caution');
         }
 
-        const doRed = (c) => {
+        const doRed = (/*c*/) => {
             leds.red.on();
             c.emit('close');
         }
 
-        sock.on('connection', (c) => {
-            doGreen(c);
-            var start, end;
-            var doorOpen = true;
-
-            button.on('down', () => {
-                turnAllOff(leds);
-                if (doorOpen) {
-                    doorOpen = false;
-                    start = new Date();
-                    doRed(c);
+        button.on('down', () => {
+            turnAllOff(leds);
+            if (doorOpen) {
+                doorOpen = false;
+                start = new Date();
+                doRed(/*c*/);
+            } else {
+                doorOpen = true;
+                end = new Date();
+                if ((end - start) > longLimit) {
+                    doYellow(/*c*/);
+                    setTimeout(() => {
+                        leds.yellow.off();
+                        doGreen(/*c*/);
+                    }, coolDown);
                 } else {
-                    doorOpen = true;
-                    end = new Date();
-                    if ((end - start) > longLimit) {
-                        doYellow(c);
-                        setTimeout(() => {
-                            leds.yellow.off();
-                            doGreen(c);
-                        }, coolDown);
-                    } else {
-                        doGreen(c);
-                    }
+                    doGreen(/*c*/);
                 }
-            });
+            }
         });
+
+        doGreen(/*c*/);
+
     });
 }
